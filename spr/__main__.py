@@ -41,54 +41,6 @@ async def main():
     await spr.stop()
 
 
-@spr.on_message(filters.command(["help", "start"]), group=2)
-async def help_command(_, message: Message):
-    if message.chat.type != "private":
-        kb = ikb({"Help": f"https://t.me/{BOT_USERNAME}?start=help"})
-        return await message.reply("Pm Me For Help", reply_markup=kb)
-    kb = ikb(
-        {
-            "Help": "bot_commands",
-            "Repo": "https://github.com/TheHamkerCat/SpamProtectionRobot",
-            "Add Me To Your Group": f"https://t.me/{BOT_USERNAME}?startgroup=new",
-            "Support Chat (for now)": "https://t.me/WBBSupport",
-        }
-    )
-    mention = message.from_user.mention
-    await message.reply_photo(
-        "https://hamker.me/logo_3.png",
-        caption=f"Hi {mention}, I'm SpamProtectionRobot,"
-        + " Choose An Option From Below.",
-        reply_markup=kb,
-    )
-
-
-@spr.on_callback_query(filters.regex("bot_commands"))
-async def commands_callbacc(_, cq: CallbackQuery):
-    text, keyboard = await help_parser(cq.from_user.mention)
-    await asyncio.gather(
-        cq.answer(),
-        cq.message.delete(),
-        spr.send_message(
-            cq.message.chat.id,
-            text=text,
-            reply_markup=keyboard,
-        ),
-    )
-
-
-async def help_parser(name, keyboard=None):
-    if not keyboard:
-        keyboard = InlineKeyboardMarkup(
-            paginate_modules(0, HELPABLE, "help")
-        )
-    return (
-        f"Hello {name}, I'm SpamProtectionRobot, I can protect "
-        + "your group from Spam and NSFW media using "
-        + "machine learning. Choose an option from below.",
-        keyboard,
-    )
-
 
 
 
